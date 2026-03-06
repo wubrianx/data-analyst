@@ -1,8 +1,8 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Home,
   TrendingUp,
@@ -24,18 +24,31 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 
-const navItems = [
-  { href: "/dashboard", label: "\u9996\u9801", icon: Home },
-  { href: "/dashboard/ga", label: "GA \u5206\u6790", icon: TrendingUp },
-  { href: "/dashboard/meta", label: "Meta \u5EE3\u544A\u5206\u6790", icon: Megaphone },
-  { href: "/dashboard/cross", label: "\u4EA4\u53C9\u5206\u6790", icon: GitCompare },
-  { href: "/dashboard/advisor", label: "\u884C\u92B7\u9867\u554F", icon: Bot },
-  { href: "/dashboard/guide", label: "API \u4E32\u63A5\u6307\u5357", icon: BookOpen },
+interface UserInfo {
+  username: string;
+  isAdmin: boolean;
+  status: {
+    demoMode: boolean;
+    ga4: boolean;
+    meta: boolean;
+    ai: boolean;
+  };
+}
+
+const allNavItems = [
+  { href: "/dashboard", label: "首頁", icon: Home, adminOnly: false },
+  { href: "/dashboard/ga", label: "GA 分析", icon: TrendingUp, adminOnly: false },
+  { href: "/dashboard/meta", label: "Meta 廣告分析", icon: Megaphone, adminOnly: false },
+  { href: "/dashboard/cross", label: "交叉分析", icon: GitCompare, adminOnly: false },
+  { href: "/dashboard/advisor", label: "行銷顧問", icon: Bot, adminOnly: false },
+  { href: "/dashboard/guide", label: "API 串接指南", icon: BookOpen, adminOnly: true },
 ];
 
-function NavContent() {
+function NavContent({ user }: { user: UserInfo | null }) {
   const pathname = usePathname();
   const router = useRouter();
+
+  const navItems = allNavItems.filter((item) => !item.adminOnly || user?.isAdmin);
 
   const handleLogout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });
@@ -46,9 +59,7 @@ function NavContent() {
   return (
     <div className="flex h-full flex-col">
       <div className="p-6">
-        <h1 className="text-lg font-bold tracking-tight">
-          {"\u6578\u64DA\u5206\u6790\u5100\u8868\u677F"}
-        </h1>
+        <h1 className="text-lg font-bold tracking-tight">數據分析儀表板</h1>
       </div>
       <Separator />
       <nav className="flex-1 space-y-1 p-3">
@@ -77,18 +88,24 @@ function NavContent() {
       </nav>
       <Separator />
       <div className="p-4 space-y-2">
-        <div className="flex items-center gap-2">
-          <span className="relative flex size-2">
-            <span className="absolute inline-flex size-full animate-ping rounded-full bg-amber-400 opacity-75" />
-            <span className="relative inline-flex size-2 rounded-full bg-amber-500" />
-          </span>
-          <span className="text-xs text-muted-foreground">
-            {"\u9023\u7DDA\u72C0\u614B"}
-          </span>
-          <Badge variant="secondary" className="ml-auto text-xs">
-            Demo
-          </Badge>
-        </div>
+        {/* Admin-only: connection status */}
+        {user?.isAdmin && (
+          <div className="space-y-1.5 mb-2">
+            <StatusDot label="GA4" connected={user.status.ga4} />
+            <StatusDot label="Meta" connected={user.status.meta} />
+            <StatusDot label="AI" connected={user.status.ai} />
+            {user.status.demoMode && (
+              <Badge variant="secondary" className="text-xs mt-1">
+                Demo 模式
+              </Badge>
+            )}
+          </div>
+        )}
+        {user && (
+          <p className="text-xs text-muted-foreground truncate">
+            {user.username}
+          </p>
+        )}
         <Button
           variant="ghost"
           size="sm"
@@ -103,7 +120,33 @@ function NavContent() {
   );
 }
 
+function StatusDot({ label, connected }: { label: string; connected: boolean }) {
+  return (
+    <div className="flex items-center gap-2">
+      <span
+        className={cn(
+          "inline-flex size-2 rounded-full",
+          connected ? "bg-emerald-500" : "bg-gray-300"
+        )}
+      />
+      <span className="text-xs text-muted-foreground">{label}</span>
+      <span className={cn("text-xs ml-auto", connected ? "text-emerald-600" : "text-gray-400")}>
+        {connected ? "已連線" : "未設定"}
+      </span>
+    </div>
+  );
+}
+
 export function Sidebar() {
+  const [user, setUser] = useState<UserInfo | null>(null);
+
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => setUser(data))
+      .catch(() => {});
+  }, []);
+
   return (
     <>
       {/* Mobile: hamburger + sheet */}
@@ -116,20 +159,16 @@ export function Sidebar() {
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="w-[260px] p-0">
-            <SheetTitle className="sr-only">
-              {"\u5C0E\u822A\u9078\u55AE"}
-            </SheetTitle>
-            <NavContent />
+            <SheetTitle className="sr-only">導航選單</SheetTitle>
+            <NavContent user={user} />
           </SheetContent>
         </Sheet>
-        <span className="text-sm font-semibold">
-          {"\u6578\u64DA\u5206\u6790\u5100\u8868\u677F"}
-        </span>
+        <span className="text-sm font-semibold">數據分析儀表板</span>
       </div>
 
       {/* Desktop: fixed sidebar */}
       <aside className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:flex lg:w-60 lg:flex-col lg:border-r lg:bg-background">
-        <NavContent />
+        <NavContent user={user} />
       </aside>
     </>
   );
