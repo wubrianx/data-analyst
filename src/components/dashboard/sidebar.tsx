@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import {
   Home,
   TrendingUp,
@@ -10,6 +11,7 @@ import {
   Bot,
   BookOpen,
   Menu,
+  LogOut,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -33,6 +35,13 @@ const navItems = [
 
 function NavContent() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await fetch("/api/auth/logout", { method: "POST" });
+    router.push("/login");
+    router.refresh();
+  };
 
   return (
     <div className="flex h-full flex-col">
@@ -80,6 +89,15 @@ function NavContent() {
             Demo
           </Badge>
         </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="w-full justify-start gap-2 text-muted-foreground"
+          onClick={handleLogout}
+        >
+          <LogOut className="size-4" />
+          登出
+        </Button>
       </div>
     </div>
   );
