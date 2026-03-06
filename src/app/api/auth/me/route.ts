@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     const { payload } = await jwtVerify(token, SECRET);
     return NextResponse.json({
       username: payload.username,
-      isAdmin: payload.username === 'ming-hsiu.wu',
+      isAdmin: payload.username === 'ming-hsiu.wu@meow-servant.com',
       status: {
         demoMode: isDemoMode(),
         ga4: hasGa4Credentials(),
