@@ -79,3 +79,40 @@ export function formatDateForApi(date: Date): string {
   const day = String(date.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
 }
+
+const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
+
+/**
+ * Validate that a string is a valid YYYY-MM-DD date.
+ * Returns true only if the format is correct AND the date is a real calendar date.
+ */
+export function isValidDateString(dateStr: string): boolean {
+  if (!DATE_REGEX.test(dateStr)) return false;
+  const parsed = new Date(dateStr + 'T00:00:00');
+  if (isNaN(parsed.getTime())) return false;
+  // Verify round-trip: the parsed date produces the same string
+  return formatDateForApi(parsed) === dateStr;
+}
+
+/**
+ * Parse and validate date range query parameters from a NextRequest.
+ * Returns validated start/end strings, or null if validation fails.
+ */
+export function parseDateParams(
+  searchParams: URLSearchParams,
+  defaults = { start: '2025-01-01', end: '2025-01-31' }
+): { start: string; end: string } | null {
+  const start = searchParams.get('start') ?? defaults.start;
+  const end = searchParams.get('end') ?? defaults.end;
+
+  if (!isValidDateString(start) || !isValidDateString(end)) {
+    return null;
+  }
+
+  // Ensure start <= end
+  if (start > end) {
+    return null;
+  }
+
+  return { start, end };
+}
