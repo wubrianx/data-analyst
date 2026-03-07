@@ -15,17 +15,27 @@ import type {
 } from './mock-data';
 
 // ---------------------------------------------------------------------------
-// Client setup
+// Client setup (lazy initialization to avoid crash when credentials are absent)
 // ---------------------------------------------------------------------------
 
-const credentials = JSON.parse(config.ga4Credentials);
-const client = new BetaAnalyticsDataClient({
-  credentials: {
-    client_email: credentials.client_email,
-    private_key: credentials.private_key,
-  },
-  projectId: credentials.project_id,
-});
+let _client: BetaAnalyticsDataClient | null = null;
+
+function getClient(): BetaAnalyticsDataClient {
+  if (!_client) {
+    if (!config.ga4Credentials) {
+      throw new Error('GA4_CREDENTIALS environment variable is required when not in demo mode');
+    }
+    const credentials = JSON.parse(config.ga4Credentials);
+    _client = new BetaAnalyticsDataClient({
+      credentials: {
+        client_email: credentials.client_email,
+        private_key: credentials.private_key,
+      },
+      projectId: credentials.project_id,
+    });
+  }
+  return _client;
+}
 
 // ---------------------------------------------------------------------------
 // Helper
@@ -47,7 +57,7 @@ async function runReport(
   startDate: string,
   endDate: string
 ): Promise<RawRow[]> {
-  const [response] = await client.runReport({
+  const [response] = await getClient().runReport({
     property,
     dimensions: dimensions.map((d) => ({ name: d })),
     metrics: metrics.map((m) => ({ name: m })),
