@@ -6,10 +6,23 @@ import { Suspense } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
+/**
+ * Validate redirect path to prevent open redirect attacks.
+ * Only allows relative paths starting with /dashboard.
+ */
+function sanitizeRedirect(path: string | null): string {
+  if (!path) return "/dashboard";
+  // Must be a relative path (starts with /) and not a protocol-relative URL (//)
+  if (!path.startsWith("/") || path.startsWith("//")) return "/dashboard";
+  // Only allow redirects within the app's known routes
+  if (!path.startsWith("/dashboard")) return "/dashboard";
+  return path;
+}
+
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const from = searchParams.get("from") || "/dashboard";
+  const from = sanitizeRedirect(searchParams.get("from"));
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
