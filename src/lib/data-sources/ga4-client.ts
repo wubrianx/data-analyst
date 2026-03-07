@@ -109,15 +109,17 @@ export const GA4Client = {
         endDate
       );
 
-      return rows.map((r) => ({
-        date: r.date as string,
-        sessions: r.sessions as number,
-        activeUsers: r.activeUsers as number,
-        bounceRate: r.bounceRate as number,
-        engagementRate: r.engagementRate as number,
-        conversions: r.conversions as number,
-        revenue: r.purchaseRevenue as number,
-      }));
+      return rows
+        .map((r) => ({
+          date: r.date as string,
+          sessions: r.sessions as number,
+          activeUsers: r.activeUsers as number,
+          bounceRate: r.bounceRate as number,
+          engagementRate: r.engagementRate as number,
+          conversions: r.conversions as number,
+          revenue: r.purchaseRevenue as number,
+        }))
+        .sort((a, b) => a.date.localeCompare(b.date));
     } catch (error) {
       console.error('[GA4Client] getTrafficOverview failed:', error);
       return [];
@@ -137,14 +139,16 @@ export const GA4Client = {
         endDate
       );
 
-      return rows.map((r) => ({
-        date: r.date as string,
-        source: r.sessionSource as string,
-        medium: r.sessionMedium as string,
-        sessions: r.sessions as number,
-        activeUsers: r.activeUsers as number,
-        conversions: r.conversions as number,
-      }));
+      return rows
+        .map((r) => ({
+          date: r.date as string,
+          source: r.sessionSource as string,
+          medium: r.sessionMedium as string,
+          sessions: r.sessions as number,
+          activeUsers: r.activeUsers as number,
+          conversions: r.conversions as number,
+        }))
+        .sort((a, b) => a.date.localeCompare(b.date));
     } catch (error) {
       console.error('[GA4Client] getTrafficSources failed:', error);
       return [];
@@ -259,12 +263,14 @@ export const GA4Client = {
         (r) => (r.conversions as number) > 0
       );
 
-      return conversionRows.map((r) => ({
-        date: r.date as string,
-        eventName: r.eventName as string,
-        conversions: r.conversions as number,
-        revenue: r.purchaseRevenue as number,
-      }));
+      return conversionRows
+        .map((r) => ({
+          date: r.date as string,
+          eventName: r.eventName as string,
+          conversions: r.conversions as number,
+          revenue: r.purchaseRevenue as number,
+        }))
+        .sort((a, b) => a.date.localeCompare(b.date));
     } catch (error) {
       console.error('[GA4Client] getConversions failed:', error);
       return [];

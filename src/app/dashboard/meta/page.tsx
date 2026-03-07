@@ -83,10 +83,13 @@ function MetaAdsContent() {
   const perfKpis = useMemo(() => {
     if (!daily || daily.length === 0)
       return { avgRoas: 0, avgCpc: 0, avgCtr: 0 };
-    const n = daily.length;
-    const avgRoas = daily.reduce((s: number, d: any) => s + (d.roas ?? 0), 0) / n;
-    const avgCpc = daily.reduce((s: number, d: any) => s + (d.cpc ?? 0), 0) / n;
-    const avgCtr = daily.reduce((s: number, d: any) => s + (d.ctr ?? 0), 0) / n;
+    const totalSpend = daily.reduce((s: number, d: any) => s + (d.spend ?? 0), 0);
+    const totalRevenue = daily.reduce((s: number, d: any) => s + (d.revenue ?? 0), 0);
+    const totalClicks = daily.reduce((s: number, d: any) => s + (d.clicks ?? 0), 0);
+    const totalImpressions = daily.reduce((s: number, d: any) => s + (d.impressions ?? 0), 0);
+    const avgRoas = totalSpend > 0 ? totalRevenue / totalSpend : 0;
+    const avgCpc = totalClicks > 0 ? totalSpend / totalClicks : 0;
+    const avgCtr = totalImpressions > 0 ? totalClicks / totalImpressions : 0;
     return { avgRoas, avgCpc, avgCtr };
   }, [daily]);
 

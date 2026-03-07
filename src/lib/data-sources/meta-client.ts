@@ -126,7 +126,7 @@ export const MetaClient = {
       const spend = pf(row.spend);
       const impressions = pf(row.impressions);
       const clicks = pf(row.clicks);
-      const ctr = pf(row.ctr);
+      const ctr = pf(row.ctr) / 100; // Meta API returns CTR as percentage (e.g. 2.8 = 2.8%), normalize to decimal
       const cpc = pf(row.cpc);
       const cpm = pf(row.cpm);
       const conversions = parseConversions(row.actions);
@@ -185,7 +185,7 @@ export const MetaClient = {
           spend: Math.round(spend * 100) / 100,
           impressions: pf(row.impressions),
           clicks: pf(row.clicks),
-          ctr: Math.round(pf(row.ctr) * 10000) / 10000,
+          ctr: Math.round(pf(row.ctr) / 100 * 10000) / 10000,
           cpc: Math.round(pf(row.cpc) * 100) / 100,
           conversions,
           revenue: Math.round(revenue * 100) / 100,
@@ -229,7 +229,7 @@ export const MetaClient = {
           spend: Math.round(spend * 100) / 100,
           impressions: pf(row.impressions),
           clicks: pf(row.clicks),
-          ctr: Math.round(pf(row.ctr) * 10000) / 10000,
+          ctr: Math.round(pf(row.ctr) / 100 * 10000) / 10000,
           cpc: Math.round(pf(row.cpc) * 100) / 100,
           cpm: Math.round(pf(row.cpm) * 100) / 100,
           conversions,
@@ -267,7 +267,7 @@ export const MetaClient = {
         impressions: pf(row.impressions),
         clicks: pf(row.clicks),
         spend: Math.round(pf(row.spend) * 100) / 100,
-        ctr: Math.round(pf(row.ctr) * 10000) / 10000,
+        ctr: Math.round(pf(row.ctr) / 100 * 10000) / 10000,
         cpc: Math.round(pf(row.cpc) * 100) / 100,
       }));
     } catch (error) {
@@ -309,7 +309,7 @@ export const MetaClient = {
           spend: Math.round(spend * 100) / 100,
           impressions: pf(row.impressions),
           clicks: pf(row.clicks),
-          ctr: Math.round(pf(row.ctr) * 10000) / 10000,
+          ctr: Math.round(pf(row.ctr) / 100 * 10000) / 10000,
           conversions,
           revenue: Math.round(revenue * 100) / 100,
           roas: Math.round(roas * 100) / 100,
@@ -357,7 +357,8 @@ export const MetaClient = {
           spend: Math.round(spend * 100) / 100,
           impressions: pf(row.impressions),
           clicks: pf(row.clicks),
-          ctr: Math.round(pf(row.ctr) * 10000) / 10000,
+          ctr: Math.round(pf(row.ctr) / 100 * 10000) / 10000,
+          cpc: Math.round(pf(row.cpc) * 100) / 100,
           conversions,
           roas: Math.round(roas * 100) / 100,
         };
@@ -403,7 +404,7 @@ export const MetaClient = {
           spend: Math.round(spend * 100) / 100,
           impressions: pf(row.impressions),
           clicks: pf(row.clicks),
-          ctr: Math.round(pf(row.ctr) * 10000) / 10000,
+          ctr: Math.round(pf(row.ctr) / 100 * 10000) / 10000,
           conversions,
           revenue: Math.round(revenue * 100) / 100,
           roas: Math.round(roas * 100) / 100,

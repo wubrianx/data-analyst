@@ -163,8 +163,8 @@ function CrossAnalysisContent() {
             data={gaChannels ?? []}
             xKey="channel"
             bars={[
-              { key: "organic", name: "自然流量", color: "#10b981" },
-              { key: "paid", name: "付費流量", color: "#6366f1" },
+              { key: "sessions", name: "工作階段", color: "#6366f1" },
+              { key: "conversions", name: "轉換", color: "#10b981" },
             ]}
           />
         </CardContent>

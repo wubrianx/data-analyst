@@ -188,6 +188,7 @@ export interface MetaAdset {
   impressions: number;
   clicks: number;
   ctr: number;
+  cpc: number;
   conversions: number;
   roas: number;
 }
@@ -720,6 +721,7 @@ export const MockMeta = {
         1,
         Math.round(clicks * a.convRate * rng.uniform(0.8, 1.2))
       );
+      const cpc = clicks > 0 ? spend / clicks : 0;
       const roas = clamp(a.roasBase * rng.uniform(0.85, 1.15), 0.5, 8);
 
       return {
@@ -731,6 +733,7 @@ export const MockMeta = {
         impressions,
         clicks,
         ctr: Math.round(ctr * 10000) / 10000,
+        cpc: Math.round(cpc * 100) / 100,
         conversions,
         roas: Math.round(roas * 100) / 100,
       };
